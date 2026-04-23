@@ -1,0 +1,9 @@
+Flask
+Flask-SQLAlchemy
+Flask-Migrate
+flask-cors
+flask-jwt-extended
+python-dotenv
+psycopg2-binary
+Werkzeug
+itsdangerous
