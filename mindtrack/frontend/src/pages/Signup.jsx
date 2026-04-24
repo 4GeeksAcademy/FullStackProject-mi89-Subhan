@@ -8,7 +8,7 @@ const Signup = () => {
 
   const handleSubmit = async e => {
     e.preventDefault()
-    const response = await fetch('https://improved-pancake-pvg5q46wx572776-5000.app.github.dev/api/signup', {
+    const response = await fetch('https://fullstackproject-mi89-subhan.onrender.com/api/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })

@@ -28,14 +28,14 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       const moodRes = await fetch(
-        "https://improved-pancake-pvg5q46wx572776-5000.app.github.dev/api/moods",
+        "https://fullstackproject-mi89-subhan.onrender.com/api/moods",
         {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
 
       const journalRes = await fetch(
-        "https://improved-pancake-pvg5q46wx572776-5000.app.github.dev/api/journal",
+        "https://fullstackproject-mi89-subhan.onrender.com/api/journal",
         {
           headers: { Authorization: `Bearer ${token}` }
         }

@@ -11,7 +11,7 @@ const Mood = () => {
     e.preventDefault();
 
     const response = await fetch(
-      "https://improved-pancake-pvg5q46wx572776-5000.app.github.dev/api/moods",
+      "https://fullstackproject-mi89-subhan.onrender.com/api/moods",
       {
         method: "POST",
         headers: {

@@ -10,7 +10,7 @@ const Journal = () => {
 
   const fetchEntries = async () => {
     const response = await fetch(
-      "https://improved-pancake-pvg5q46wx572776-5000.app.github.dev/api/journal",
+      "https://fullstackproject-mi89-subhan.onrender.com/api/journal",
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -34,8 +34,8 @@ const Journal = () => {
     e.preventDefault();
 
     const url = editingId
-      ? `https://improved-pancake-pvg5q46wx572776-5000.app.github.dev/api/journal/${editingId}`
-      : "https://improved-pancake-pvg5q46wx572776-5000.app.github.dev/api/journal";
+      ? `https://fullstackproject-mi89-subhan.onrender.com/api/journal/${editingId}`
+      : "https://fullstackproject-mi89-subhan.onrender.com/api/journal";
 
     const method = editingId ? "PUT" : "POST";
 
@@ -62,7 +62,7 @@ const Journal = () => {
 
   const handleDelete = async (id) => {
     await fetch(
-      `https://improved-pancake-pvg5q46wx572776-5000.app.github.dev/api/journal/${id}`,
+      `https://fullstackproject-mi89-subhan.onrender.com/api/journal/${id}`,
       {
         method: "DELETE",
         headers: {
