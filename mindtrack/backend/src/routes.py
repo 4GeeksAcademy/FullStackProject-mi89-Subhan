@@ -242,29 +242,24 @@ def search_resources():
         return jsonify({"msg": "City is required"}), 400
 
     try:
-        geo_url = "https://nominatim.openstreetmap.org/search"
+        city_name = city.split(",")[0].strip()
+
+        geo_url = "https://geocoding-api.open-meteo.com/v1/search"
         geo_params = {
-            "format": "json",
-            "limit": 1,
-            "q": city
+            "name": city_name,
+            "count": 1,
+            "language": "en",
+            "format": "json"
         }
 
-        headers = {
-            "User-Agent": "MindTrackStudentProject/1.0"
-        }
-
-        geo_response = requests.get(geo_url, params=geo_params, headers=headers)
-
-        if geo_response.status_code != 200:
-            return jsonify({"msg": "Location search failed"}), 500
-
+        geo_response = requests.get(geo_url, params=geo_params, timeout=15)
         geo_data = geo_response.json()
 
-        if len(geo_data) == 0:
+        if "results" not in geo_data or len(geo_data["results"]) == 0:
             return jsonify({"msg": "Location not found"}), 404
 
-        lat = geo_data[0]["lat"]
-        lon = geo_data[0]["lon"]
+        lat = geo_data["results"][0]["latitude"]
+        lon = geo_data["results"][0]["longitude"]
 
         overpass_url = "https://overpass-api.de/api/interpreter"
 
@@ -284,7 +279,8 @@ def search_resources():
         overpass_response = requests.post(
             overpass_url,
             data={"data": query},
-            headers=headers
+            timeout=30,
+            headers={"User-Agent": "MindTrackStudentProject/1.0"}
         )
 
         if overpass_response.status_code != 200:
