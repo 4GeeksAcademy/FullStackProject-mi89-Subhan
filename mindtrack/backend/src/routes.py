@@ -1,4 +1,5 @@
 import os
+import requests
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from itsdangerous import URLSafeTimedSerializer
@@ -232,3 +233,82 @@ def delete_journal_entry(entry_id):
     db.session.commit()
 
     return jsonify({"msg": "Entry deleted"}), 200
+
+@api.route("/resources/search", methods=["GET"])
+def search_resources():
+    city = request.args.get("city")
+
+    if not city:
+        return jsonify({"msg": "City is required"}), 400
+
+    try:
+        geo_url = "https://nominatim.openstreetmap.org/search"
+        geo_params = {
+            "format": "json",
+            "limit": 1,
+            "q": city
+        }
+
+        headers = {
+            "User-Agent": "MindTrackStudentProject/1.0"
+        }
+
+        geo_response = requests.get(geo_url, params=geo_params, headers=headers)
+
+        if geo_response.status_code != 200:
+            return jsonify({"msg": "Location search failed"}), 500
+
+        geo_data = geo_response.json()
+
+        if len(geo_data) == 0:
+            return jsonify({"msg": "Location not found"}), 404
+
+        lat = geo_data[0]["lat"]
+        lon = geo_data[0]["lon"]
+
+        overpass_url = "https://overpass-api.de/api/interpreter"
+
+        query = f"""
+        [out:json][timeout:25];
+        (
+          node["amenity"="clinic"](around:15000,{lat},{lon});
+          node["amenity"="hospital"](around:15000,{lat},{lon});
+          node["healthcare"="psychotherapist"](around:15000,{lat},{lon});
+          node["healthcare"="counselling"](around:15000,{lat},{lon});
+          way["amenity"="clinic"](around:15000,{lat},{lon});
+          way["amenity"="hospital"](around:15000,{lat},{lon});
+        );
+        out center tags;
+        """
+
+        overpass_response = requests.post(
+            overpass_url,
+            data={"data": query},
+            headers=headers
+        )
+
+        if overpass_response.status_code != 200:
+            return jsonify({"msg": "Resource search failed"}), 500
+
+        overpass_data = overpass_response.json()
+
+        resources = []
+
+        for item in overpass_data.get("elements", []):
+            tags = item.get("tags", {})
+
+            if not tags.get("name"):
+                continue
+
+            resources.append({
+                "id": item.get("id"),
+                "name": tags.get("name"),
+                "type": tags.get("healthcare") or tags.get("amenity") or "health resource",
+                "address": tags.get("addr:full") or tags.get("addr:street") or "Address not listed"
+            })
+
+        return jsonify(resources[:10]), 200
+
+    except Exception as error:
+        print(error)
+        return jsonify({"msg": "Something went wrong while searching resources"}), 500
